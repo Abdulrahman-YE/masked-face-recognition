@@ -14,20 +14,21 @@ import timm
 class InceptionResnet(nn.Module):
     def __init__(self, device, pool=None, dropout=0.3, pretrain=True):
         super(InceptionResnet, self).__init__()
-        # fit an image, the output is a 512 embedding original
-        # the model is pre-trained on vggface2
+        # جعل الصورة مناسبة الحجم, الناتج متجه رقمي 512 يعبر عن ملامح الشخص
+        # النموذج مدرب على Vggface2
         # pretrained='vggface2'
         if pretrain:
             self.net = InceptionResnetV1(pretrained='vggface2', dropout_prob=dropout, device=device)
         else:
             self.net = InceptionResnetV1(dropout_prob=dropout, device=device)
-        # the number of channels in the output of convolutional layers
+        # عدد القنوات في مخرجات طيقة الـ convolutional
         self.out_features = self.net.last_linear.in_features
-        # keep convolutional layers only and remove linear layers and global average pooling layer
+        # احذف الطبقات الخطية و طبقة الـ Global Average Pooling 
+        # يبقى فقط ال Convoluional
         if pool == 'gem':
             self.net.avgpool_1a = GeM(p_trainable=True)
     def forward(self, x):
-        # return a 512 dimension vector
+        # ارجع متجة رقمي 512
         return self.net(x)
 
 # EfficientNet
@@ -41,7 +42,7 @@ class EfficientNetEncoderHead(nn.Module):
             self.net = EfficientNet.from_name(f'efficientnet-b{self.depth}')
         self.out_features = self.net._fc.in_features
     def forward(self, x):
-        # only the cnn part
+        # جزء ال CNN فقط
         return self.net.extract_features(x)
 
 # SE-ResNeXt101
@@ -49,7 +50,7 @@ class SEResNeXt101(nn.Module):
     def __init__(self, pretrained=True):
         super(SEResNeXt101, self).__init__()
         self.net = timm.create_model('gluon_seresnext101_32x4d', pretrained=pretrained)
-        # the output size of this model
+        # حجم ناتج هذا النموذج
         self.out_features = self.net.fc.in_features
     def forward(self, x):
         return self.net.forward_features(x)
@@ -76,8 +77,8 @@ class GeM(nn.Module):
 class FaceNet(nn.Module):
     def __init__(self, model_name=None, pool=None, dropout=0.0, embedding_size=512, device='cuda', pretrain=True):
         super(FaceNet, self).__init__()
-        # Backbone
-        # three models choice 1. SE-ResNeXt101 2.EfficientNetB7 3.InceptionResnetV1 (Pre-trained for face recog.)
+        # العمود الفقري Backbone
+        # اختر واحد من النماذج الثلاثه المدربة على التعرف على الاشخاص
         self.model_name = model_name
 
         # model (backbone)
@@ -112,7 +113,7 @@ class FaceNet(nn.Module):
         # global pool
         x = self.global_pool(x)
         x = self.dropout(x)
-        # change the output from cnn to a vector first
+        # حول المخرج من CNN الى متجه اولا
         x = x[:,:,0,0]
         # neck
         embeddings = self.neck(x)
@@ -138,8 +139,8 @@ class ArcMarginProduct(nn.Module):
 class FaceNet2(nn.Module):
     def __init__(self, num_classes, model_name=None, pool=None, dropout=0.0, embedding_size=512, device='cuda', pretrain=True):
         super(FaceNet2, self).__init__()
-        # Backbone (backbone)
-        # three models choice 1. SE-ResNeXt101 2.EfficientNetB7 3.InceptionResnetV1 (Pre-trained for face recog.)
+       # العمود الفقري Backbone
+        # اختر واحد من النماذج الثلاثه المدربة على التعرف على الاشخاص
         self.model_name = model_name
 
         # model

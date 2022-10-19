@@ -1,4 +1,5 @@
 
+from pathlib import Path
 from facenet_pytorch import InceptionResnetV1
 from torchvision import transforms
 import torch
@@ -8,12 +9,13 @@ from face_detector import FaceDetector
 
 
 
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
 
 # تموذج التعرف على الوجه غير المقنع
 NORMAL_RESNET = InceptionResnetV1(pretrained='vggface2', device=DEVICE).eval()
 # نموذج التعرف على الوجه
-MASKED_MODEL = torch.load('arcface1.pt', map_location=DEVICE)
+MASKED_MODEL = torch.load(Path("face-model/arcface1.pt"), map_location=DEVICE)
 
 NORMALIZE = transforms.Normalize(
     mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])

@@ -115,7 +115,7 @@ def detect(save_img=True, out="static/images/test.jpg", source='data/samples/goo
 
             #save_path = str(Path(out) / Path(p).name)
             if out is not None:
-                save_path = str(Path(out) / p.split('\\')[1])
+                save_path = str(Path(out) / p.split('/')[1])
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  #  normalization gain whwh
             if det is not None and len(det):

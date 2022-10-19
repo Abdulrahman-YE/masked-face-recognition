@@ -4,7 +4,7 @@ import cv2
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-class FaceDectector(object):
+class FaceDetector(object):
     
     def __init__(self,resize=1, *args, **kwargs):
         self.mtcnn = MTCNN(*args, **kwargs)

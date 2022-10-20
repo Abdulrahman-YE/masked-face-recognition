@@ -12,7 +12,7 @@ def compare_embed(base, embed, metrics='euclidean'):
         return cosine_distances(base, embed)
 
 # check comparison result against prototype with threshold
-def prototype_compare_result(arr, threshold=1):
+def prototype_compare_result(arr, threshold=0.7):
     """
         تحديد ناتج المقارنة مع الملامح الاخرى و مقارنتها مع العتبه المحدده
         المخلات : 
@@ -23,7 +23,7 @@ def prototype_compare_result(arr, threshold=1):
     if arr.min() > threshold:
         return None,None
     else:
-        return arr.argmin(), 1 -arr.min() 
+        return arr.argmin(), arr.min() 
 
 
 def recognize(db, embed, mode='prototype'):
@@ -37,7 +37,7 @@ def recognize(db, embed, mode='prototype'):
          - نسبة التشابة
     """
     mode = mode # prototype or each
-    metrics = 'euclidean' # euclidean, cosine, cond_prob
-    threshold = 0.8
+    metrics = 'cosine' # euclidean, cosine, cond_prob
+    threshold = 0.6
 
     return prototype_compare_result(compare_embed(db, embed.reshape(1,512), metrics=metrics), threshold=threshold)

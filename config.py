@@ -22,7 +22,7 @@ NORMALIZE = transforms.Normalize(
 
 FACE_DETECTOR = FaceDetector(
         factor=0.7,
-        min_face_size= 400,
+        min_face_size= 150,
         keep_all=True,
         device =DEVICE)
 

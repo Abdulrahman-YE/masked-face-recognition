@@ -13,13 +13,16 @@ def recognize_user(img, is_masked):
     tensor = NORMALIZE(TRANSFORM(img).float()).unsqueeze(0).to(DEVICE)
 
     # if is_masked == False:
-    with torch.no_grad():
-        embedding = MASKED_MODEL(tensor)['embeddings'].cpu().numpy()
-    result,conf = recognize(embed_matrix, embedding)
-    if result is not None:
-        return users[result].name, conf
-    else:
-        return None,conf
+    try:
+        with torch.no_grad():
+            embedding = MASKED_MODEL(tensor)['embeddings'].cpu().numpy()
+        result,conf = recognize(embed_matrix, embedding)
+        if result is not None:
+            return users[result].name, conf
+        else:
+            return None,conf
+    except:
+        return None, 0.0
     # else:
     #     with torch.no_grad():
     #         embedding = NORMAL_FACE(tensor).cpu().numpy()

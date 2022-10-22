@@ -2,7 +2,6 @@ from facenet_pytorch import MTCNN
 import torch
 import cv2
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class FaceDetector(object):
     
@@ -18,7 +17,7 @@ class FaceDetector(object):
                     for f in frame
 
             ]
-                      
+
         boxes, probs = self.mtcnn.detect(frame)
         faces = []
         if boxes is None:
@@ -26,11 +25,12 @@ class FaceDetector(object):
         for i, frame in enumerate(boxes):
             if frame is None:
                 continue
-            x = int(min(frame[0], frame[2]))
+            x = int(min(frame[0], frame[2])) if int(min(frame[0], frame[2])) >= 0 else 0
             w = int(max(frame[0], frame[2]))
-            y = int(min(frame[1], frame[3]))
+            y = int(min(frame[1], frame[3])) if int(min(frame[1], frame[3])) >=0 else 0
             h = int(max(frame[1], frame[3]))
 
+            print(f"(x,w,y,h):({x},{w},{y},{h})")
             faces.append((x, y, w, h))
         return faces
 

@@ -20,10 +20,11 @@ def prototype_compare_result(arr, threshold=0.7):
         - arr : مصفوفة الملامح
         - threshold : العتبة التي لا يمكن ان تعدها نسبة الاختلاف
     """
+    print(f'Array Min : {arr.min()} ')
     if arr.min() > threshold:
         return None,None
     else:
-        return arr.argmin(), arr.min() 
+        return arr.argmin(), 1- arr.min() 
 
 
 def recognize(db, embed, mode='prototype'):
@@ -38,6 +39,6 @@ def recognize(db, embed, mode='prototype'):
     """
     mode = mode # prototype or each
     metrics = 'cosine' # euclidean, cosine, cond_prob
-    threshold = 0.6
+    threshold = 0.73
 
     return prototype_compare_result(compare_embed(db, embed.reshape(1,512), metrics=metrics), threshold=threshold)

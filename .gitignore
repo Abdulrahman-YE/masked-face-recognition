@@ -132,5 +132,8 @@ dmypy.json
 # Images
 out/
 images/
-
+video/
 #Model
+face-model/
+
+persons.json

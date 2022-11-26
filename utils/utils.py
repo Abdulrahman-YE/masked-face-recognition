@@ -20,6 +20,10 @@ from tqdm import tqdm
 
 from . import torch_utils  # , google_utils
 
+from . import logger
+
+log = logger.get_logger("Utils")
+
 # Set printoptions
 torch.set_printoptions(linewidth=320, precision=5, profile='long')
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5
@@ -53,13 +57,12 @@ def check_file(file):
         return files[0]  # return first file if multiple found
 
 
-def check_folder(folder):
+def check_folder(folder) ->  Path or None:
     # Searches for file if not found locally
     if os.path.isdir(folder):
-        return folder
-    else:
-       raise Exception(f'Specified folder does not exist {folder}')
-
+        return Path(folder)
+    else :
+        return None
 
 def load_classes(path):
     # Loads *.names file at 'path'
@@ -1101,4 +1104,4 @@ def load_img(file):
         
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = np.ascontiguousarray(img)
-        return os.path.basename(file), img
+        return img

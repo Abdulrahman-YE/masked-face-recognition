@@ -15,18 +15,20 @@ class Person(BaseModel):
     # اسم الشخص
     name : str
     # ملامح الشخص
-    embed : Optional[np.ndarray]
+    mask_embed : Optional[np.ndarray]
+    no_mask_embed : Optional[np.ndarray]
 
 
-    @validator('embed', pre=True)
+    @validator('mask_embed', "no_mask_embed", pre=True)
     def toNumpy(cls, v):
         """
-            دالة يتم استدعائها قبل ما يتم اسناد القيمة الى embed.
+            دالة يتم استدعائها قبل ما يتم اسناد القيمة الى mask_embed.
             لتاكد من انها البيانات من نوع مصفوفة نمباي numpy
         """
         if isinstance(v, list):
             return np.array(v)
         return v
+    
     class Config:
         arbitrary_types_allowed = True
         json_dumps = orjson_dumps

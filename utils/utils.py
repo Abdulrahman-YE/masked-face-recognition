@@ -1093,15 +1093,15 @@ def plot_results(start=0, stop=0, bucket='', id=()):  # from utils.utils import 
 
 
 
-def load_img(file):
+def load_img(file : Path):
     """Load image of person
     arg:
         file : str 
     return:
         set : (file_name, img)"""
     if os.path.isfile(file):
-        img = cv2.imread(file)
-        
+        img = cv2.imread(str(file))
+
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = np.ascontiguousarray(img)
         return img

@@ -3,7 +3,12 @@ from typing import Optional
 import numpy as np
 import orjson
 from pydantic import BaseModel, validator
+import argparse
+from pathlib import Path
+import os
+from utils.logger import get_logger
 
+log = get_logger("Person")
 def orjson_dumps(v, *, default):
     # orjson.dumps returns bytes, to match standard json.dumps we need to decode
     return orjson.dumps(v, default=default, option=orjson.OPT_SERIALIZE_NUMPY).decode()
@@ -60,4 +65,19 @@ def update_persons(persons, file='persons.json'):
         if i < num_of_persons -1:
             f.write(',')
     f.write(']')
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--source', type=str, default='images', help='المجلد الذي يحتوي على صور الاشخاص')
+
+    opt = parser.parse_args()
+    if Path(opt.source).exists():
+        source = Path(opt.source)
+        for f in os.listdir(source):
+            print(f)
+            os.system(f"python test.py --source \"{source.joinpath(f)}\"")
+    else:
+        log.debug(f"Folder {opt.source} does not exists.")
     

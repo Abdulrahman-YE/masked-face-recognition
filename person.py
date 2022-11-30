@@ -77,7 +77,7 @@ if __name__ == '__main__':
         source = Path(opt.source)
         for f in os.listdir(source):
             print(f)
-            os.system(f"python test.py --source \"{source.joinpath(f)}\"")
+            os.system(f"python add_person.py --source \"{source.joinpath(f)}\"")
     else:
         log.debug(f"Folder {opt.source} does not exists.")
     

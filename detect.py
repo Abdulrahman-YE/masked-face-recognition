@@ -1,5 +1,5 @@
 import argparse
-from config import DEVICE, MASKED_MODEL, NORMALIZE, TRANSFORM
+from config import DEVICE, MASKED_MODEL, NORMALIZE, TRANSFORM, NORMAL_RESNET
 from models import *
 from person import read_persons
 from recognize import recognize  # set ONNX_EXPORT in models.py
@@ -8,30 +8,31 @@ from utils.utils import *
 
 
 users = []
-embed_matrix = []
+mask_embed = []
+no_mask_embed = []
 def recognize_user(img, is_masked):
     tensor = NORMALIZE(TRANSFORM(img).float()).unsqueeze(0).to(DEVICE)
-
-    # if is_masked == False:
     try:
-        with torch.no_grad():
-            embedding = MASKED_MODEL(tensor)['embeddings'].cpu().numpy()
-        result,conf = recognize(embed_matrix, embedding)
-        if result is not None:
-            return users[result].name, conf
+        if is_masked == True:
+            with torch.no_grad():
+                embedding = MASKED_MODEL(tensor)['embeddings'].cpu().numpy()
+            result,conf = recognize(mask_embed, embedding)
+            if result is not None:
+                return users[result].name, conf
+            else:
+                return None,conf
         else:
-            return None,conf
-    except:
-        return None, 0.0
-    # else:
-    #     with torch.no_grad():
-    #         embedding = NORMAL_FACE(tensor).cpu().numpy()
-    #     result, conf = recognize(not_masked_db, embedding)
-    #     if result is not None:
-    #         return users[result], conf
-    #     else:
-    #         return None, None
-       
+            with torch.no_grad():
+                embedding = NORMAL_RESNET(tensor).cpu().numpy()
+            result,conf = recognize(no_mask_embed, embedding)
+            if result is not None:
+                return users[result].name, conf
+            else:
+                return None,conf
+    except Exception as e:
+        log.exception(e)
+        exit(0)       
+    #
     
 def detect(save_img=True, out="static/images/test.jpg", source='data/samples/good_test.jpg'):
     label = ''
@@ -135,7 +136,6 @@ def detect(save_img=True, out="static/images/test.jpg", source='data/samples/goo
                     if im0 is not None:
                         
                         resized = im0[int(xyxy[1]):int(xyxy[3]), int(xyxy[0]):int(xyxy[2])]
-                        print(f'is_masked : {(cls == 1.0)}')
                         result, con = recognize_user(cv2.cvtColor( resized, cv2.COLOR_BGR2RGB), is_masked=(cls == 1.0))
                         if save_txt:  # Write to file
                             xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
@@ -191,7 +191,8 @@ def detect(save_img=True, out="static/images/test.jpg", source='data/samples/goo
 if __name__ == '__main__':
     users  = read_persons()
     for i in users:
-        embed_matrix.append(i.embed)
+        mask_embed.append(i.mask_embed)
+        no_mask_embed.append(i.no_mask_embed)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', type=str, default='cfg/yolo-fastest.cfg', help='*.cfg path')
@@ -216,4 +217,4 @@ if __name__ == '__main__':
     print(opt)
 
     with torch.no_grad():
-        detect(out="out", source=opt.source)
+        detect(out=opt.output, source=opt.source)

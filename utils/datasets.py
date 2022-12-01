@@ -19,6 +19,7 @@ from utils.utils import xyxy2xywh, xywh2xyxy
 help_url = 'https://github.com/ultralytics/yolov3/wiki/Train-Custom-Data'
 img_formats = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.dng']
 vid_formats = ['.mov', '.avi', '.mp4', '.mpg', '.mpeg', '.m4v', '.wmv', '.mkv']
+url_ipWebcam = "http://192.168.1.4:8080/video"
 
 # Get orientation exif tag
 for orientation in ExifTags.TAGS.keys():
@@ -201,13 +202,18 @@ class LoadStreams:  # multiple IP or RTSP cameras
         for i, s in enumerate(sources):
             # Start the thread to read frames from the video stream
             print('%g/%g: %s... ' % (i + 1, n, s), end='')
-            cap = cv2.VideoCapture(0 if s == '0' else s)
+            if s == '0':
+                cap = cv2.VideoCapture(0)
+            elif s == 'android':
+                cap = cv2.VideoCapture(url_ipWebcam)
+            else:
+                cap = cv2.VideoCapture(s)
             assert cap.isOpened(), 'Failed to open %s' % s
             w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
             if self.EXPOSURE:
                 cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
-                cap.set(cv2.CAP_PROP_EXPOSURE,self.EXPOSURE)
+                cap.set(cv2.CAP_PROP_EXPOSURE, self.EXPOSURE)
             else:
                 cap.set(cv2.CAP_PROP_AUTO_EXPOSURE, 1)
             # w = int(cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640))
@@ -217,7 +223,9 @@ class LoadStreams:  # multiple IP or RTSP cameras
             thread = Thread(target=self.update, args=([i, cap]), daemon=True)
             print(' success (%gx%g at %.2f FPS).' % (w, h, fps))
             thread.start()
+
         print('')  # newline
+
 
         # check for common shapes
         s = np.stack([letterbox(x, new_shape=self.img_size)[0].shape for x in self.imgs], 0)  # inference shapes

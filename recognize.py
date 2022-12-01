@@ -38,6 +38,6 @@ def recognize(db, embed, mode='prototype'):
     """
     mode = mode # prototype or each
     metrics = 'cosine' # euclidean, cosine, cond_prob
-    threshold = 0.65
+    threshold = 0.55
 
     return prototype_compare_result(compare_embed(db, embed.reshape(1,512), metrics=metrics), threshold=threshold)

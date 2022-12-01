@@ -38,7 +38,7 @@ def detect(save_img=True, out="static/images/test.jpg", source='data/samples/goo
     label = ''
     imgsz = (320, 192) if ONNX_EXPORT else opt.img_size  # (320, 192) or (416, 256) or (608, 352) for (height, width)
     weights, half, view_img, save_txt = opt.weights, opt.half, opt.view_img, opt.save_txt
-    webcam = source == '0' or source.startswith('rtsp') or source.startswith('http') or source.endswith('.txt')
+    webcam = source == '0' or source.startswith('rtsp') or source.startswith('http') or source.endswith('.txt') or source == 'android'
 
     # Initialize
     device = torch_utils.select_device(device='cpu' if ONNX_EXPORT else opt.device)
